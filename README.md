@@ -4,12 +4,15 @@ UPMEM LLM framework for profiling / simulation
 This library allows
 
 1. Profiling PyTorch neural networks on a CPU,
-2. Simulating the execution of the neural network in a target hardware accelerator.
+2. Simulating the execution of the neural network in a target hardware
+accelerator.
 
 Usage
 -----
 
-1. Import the `upmem_llm_framework` library and [`typer`](https://typer.tiangolo.com/). Create a `typer` app to handle the user input for the profiler.
+1. Import the `upmem_llm_framework` library and
+[`typer`](https://typer.tiangolo.com/). Create a `typer` app to handle the user
+input for the profiler.
 
     ```python
     # file: my_profiler.py
@@ -62,8 +65,8 @@ Usage
 
 ### Examples
 
-You can find usage examples with a custom PyTorch model in `nn_example.py` and with a model from
-HuggingFace in `hf_example.py`.
+You can find usage examples with a custom PyTorch model in `nn_example.py` and
+with a model from HuggingFace in `hf_example.py`.
 
 <details>
   <summary>PyTorch model</summary>
@@ -123,53 +126,58 @@ There are many ways to prepare coffee, and the method you choose will depend on 
 Profiler
 --------
 
-The profiler records the start time and end time of a computation layer or function.
+The profiler records the start time and end time of a computation layer or
+function.
 Currently, the profiler doesn't track the real power consumption of the CPU.
 
 The profiler identifies a layer or function by 4 parameters:
 
-1. Layer type (e.g. `Linear` module) or function (e.g. `softmax`),
-2. Context when the layer or function is called, meaning the variable name assigned to the layer
-or function (e.g. `q_proj = torch.nn.Linear(...)` has a context of `q_proj`),
+1. Layer type (f.e. `Linear` module) or function (f.e. `softmax`),
+2. Context when the layer or function is called, meaning the variable name
+assigned to the layer or function (f.e. `q_proj = torch.nn.Linear(...)` has a
+context of `q_proj`),
 3. the input dimensions of the layer or function,
-4. specifically for layer, a unique id assigned at layer initialization.
+4. specifically for layer, a unique ID assigned at layer initialization.
 
 ### Profiler output
 
-By default, the profiler reports a summary with execution time, energy (when simulating),
-and power consumption (when simulating) at the end of its execution.
+By default, the profiler reports a summary with execution time, energy (when
+simulating), and power consumption (when simulating) at the end of its
+execution.
 
-When simulating, this summary breaks down into the summarization (encoding) phase and
-the generation (decoding) phase.
+When simulating, this summary breaks down into the summarization (encoding)
+phase and the generation (decoding) phase.
 
 You can enable the following flags to show more information:
 
-* `--report-layers`: reports the created layers in the neural network with its associated parameters
-* `--report-functions`: reports the called functions during the forward pass of the neural network
-with its associated parameters
-* `--print-log`: prints a time-ordered detailed log of each layer and function executed during the
-forward pass of the neural network
+* `--report-layers`: reports the created layers in the neural network with its
+associated parameters
+* `--report-functions`: reports the called functions during the forward pass of
+the neural network with its associated parameters
+* `--print-log`: prints a time-ordered detailed log of each layer and function
+executed during the forward pass of the neural network
 
 Simulation
 ----------
 
-To run a simulation, library users need to provide a dictionary mapping layers with a device or
-hardware accelerator.
+To run a simulation, library users need to provide a dictionary mapping layers
+with a device or hardware accelerator.
 
 This dictionary contains `name_of_layer:device,options` key-value pairs.
 The name of the layer corresponds to the context concept introduced before.
-The device corresponds to one of the accelerators defined in `sim_architectures.yaml`.
+The device corresponds to one of the accelerators defined in
+`sim_architectures.yaml`.
 
 Currently supported options:
 
-* 't' or transfer point: the input of a layer with this option comes from the CPU,
-which means that the last device sent its results back to the CPU and the CPU is sending them back
-as input to the layer's device.
-* 'm' or MoE transfer point: the input of a layer with this option comes from the CPU but only once
-since the input is shared across different MoEs.
+* 't' or transfer point: the input of a layer with this option comes from the
+CPU, which means that the last device sent its results back to the CPU and the
+CPU is sending them back as input to the layer's device.
+* 'm' or MoE transfer point: the input of a layer with this option comes from
+the CPU but only once since the input is shared across different MoEs.
 
-For instance, for a neural network composed of 2 Linear layers that execute sequentially in
-different chips:
+For instance, for a neural network composed of 2 Linear layers that execute
+sequentially in different chips:
 
 ```python
 layer_mapping = {
@@ -205,7 +213,8 @@ python3 hf_example.py --simulation profile
 
 The file `sim_architectures.yaml` contains hardware accelerator profiles.
 
-To add a new hardware accelerator profile, create a YAML file with the following structure:
+To add a new hardware accelerator profile, create a YAML file with the following
+structure:
 
 ```yaml
 # yaml-language-server: $schema=<path-to-this-library>/architectures_schema.json
@@ -239,15 +248,17 @@ resulting in `new-device` in the layer mapping.
 
 ### Notes on simulation
 
-This library makes two assumptions to simplify execution modelling across hardware profiles:
+This library makes two assumptions to simplify execution modelling across
+hardware profiles:
 
-1. Ignored interconnection communication latency: it assumes that inter-communication between
-devices finishes fast enough that it can overlap with compute and get hidden.
-For instance, when simulating more than one GPU, it doesn't model the required data exchange
-between them.
+1. Ignored interconnection communication latency: it assumes that
+intercommunication between devices finishes fast enough that it can overlap with
+compute and get hidden.
+For instance, when simulating more than one GPU, it doesn't model the required
+data exchange between them.
 For an AI-PIM device (DIMM), it doesn't model communication within a DIMM.
-2. Devices always reach peak performance. All hardware profiles perform operations at their peak
-performance. This is unrealistic in some scenarios.
+2. Devices always reach peak performance. All hardware profiles perform
+operations at their peak performance. This is unrealistic in some scenarios.
 Adding a performance ratio to model this is left to future work.
 
 Installation
@@ -259,8 +270,9 @@ Installation
 
 This library expects Python 3.10.
 
-If your distribution doesn't provide it, you can use [`pyenv`](https://github.com/pyenv/pyenv)
-to install it, or any other Python version manager:
+If your distribution doesn't provide it, you can use
+[`pyenv`](https://github.com/pyenv/pyenv) to install it, or any other Python
+version manager:
 
 ```bash
 pyenv install 3.10
@@ -290,8 +302,8 @@ python -m pip install .
 
 ### Developer installation
 
-To install the library for editing in your current Python environment, with the necessary
-development dependencies:
+To install the library for editing in your current Python environment, with the
+necessary development dependencies:
 
 ```bash
 python -m pip install -e '.[dev]'
@@ -307,7 +319,8 @@ python -m pytest
 
 #### Formatting
 
-This project uses `black` formatting. Please, make sure to run it before committing:
+This project uses `black` formatting. Please, make sure to run it before
+committing:
 
 ```bash
 python -m black src/upmem_llm_framework/*.py
