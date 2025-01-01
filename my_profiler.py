@@ -5,30 +5,34 @@ import torch.nn as nn
 
 app = typer.Typer(callback=upmem_layers.initialize_profiling_options)
 
+# 간단한 PyTorch 모델
+class SimpleModel(nn.Module):
+    def __init__(self):
+        super(SimpleModel, self).__init__()
+        self.linear = nn.Linear(10, 5)
+
+    def forward(self, x):
+        return self.linear(x)
+
 @app.command()
 def profile(my_input: str):
     upmem_layers.profiler_init()
 
-    # 모델 정의
-    class SimpleModel(nn.Module):
-        def __init__(self):
-            super(SimpleModel, self).__init__()
-            self.linear = nn.Linear(10, 5)
-
-        def forward(self, x):
-            return self.linear(x)
-
+    # PyTorch 모델 생성
     model = SimpleModel()
-
-    # 입력 텐서 정의
     myTensor = torch.randn(1, 10)
 
-    # 프로파일링 실행
+    # 프로파일링 시작
     upmem_layers.profiler_start()
+
+    # 모델 실행
     prediction = model.forward(myTensor)
+
+    # 프로파일링 종료
     upmem_layers.profiler_end()
 
-    print("Prediction:", prediction)
+    # 예측 결과 출력
+    print("PyTorch Model Prediction:", prediction)
 
 if __name__ == "__main__":
     app()
